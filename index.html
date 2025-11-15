@@ -1,0 +1,467 @@
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  StyleSheet
+} from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { StatusBar } from "expo-status-bar";
+
+const Tab = createBottomTabNavigator();
+
+/* ---------- Reusable pill ---------- */
+function Pill({ label, active, onPress }) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.pill, active && styles.pillActive]}
+    >
+      <Text style={[styles.pillText, active && styles.pillTextActive]}>
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
+/* ---------- LYRIC LAB ---------- */
+
+function LyricLabScreen() {
+  const [mood, setMood] = useState("Flex / Confidence");
+  const [language, setLanguage] = useState("English");
+  const [artist, setArtist] = useState("Neutral");
+  const [topic, setTopic] = useState("");
+  const [rhyme, setRhyme] = useState("");
+  const [bars, setBars] = useState(
+    "Cook up a topic and tap Generate to preview demo bars."
+  );
+
+  const handleGenerate = () => {
+    if (!topic.trim()) {
+      setBars("Type a song topic first – heartbreak, grind, fake friends…");
+      return;
+    }
+
+    const r = rhyme.trim() || "again";
+
+    const demo = [
+      `Turned my heartbreak into hundred-million streams, now they spin it every ${r}.`,
+      `Manifested mansions from a notebook and a cheap mic, that’s ${r}.`,
+      `Used to feel invisible, now the whole city scream my name again and ${r}.`,
+      `Every L was a beat switch, now I ride a different wave, no ${r}.`
+    ].join("\n");
+
+    setBars(demo);
+  };
+
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.screenInner}>
+      <Text style={styles.badgeLive}>LIVE • BARS LAB</Text>
+      <Text style={styles.title}>Lyric Engine</Text>
+      <Text style={styles.subtitle}>Step 1 • Cook bars</Text>
+
+      <Text style={styles.sectionLabel}>Mood / vibe</Text>
+      <View style={styles.rowWrap}>
+        {[
+          "Flex / Confidence",
+          "Heartbreak",
+          "Pain / Real Talk",
+          "Toxic Love",
+          "Party / Turn Up"
+        ].map((m) => (
+          <Pill
+            key={m}
+            label={m}
+            active={mood === m}
+            onPress={() => setMood(m)}
+          />
+        ))}
+      </View>
+
+      <Text style={styles.sectionLabel}>Language</Text>
+      <View style={styles.rowWrap}>
+        {["English", "Spanglish", "Spanish", "Bilingual"].map((lng) => (
+          <Pill
+            key={lng}
+            label={lng}
+            active={language === lng}
+            onPress={() => setLanguage(lng)}
+          />
+        ))}
+      </View>
+
+      <Text style={styles.sectionLabel}>
+        Artist preset (influence, not copy)
+      </Text>
+      <View style={styles.rowWrap}>
+        {[
+          "Neutral",
+          "Drake",
+          "Kendrick",
+          "Mac Miller",
+          "Peso Pluma",
+          "Bad Bunny",
+          "Lil Uzi"
+        ].map((a) => (
+          <Pill
+            key={a}
+            label={a}
+            active={artist === a}
+            onPress={() => setArtist(a)}
+          />
+        ))}
+      </View>
+
+      <Text style={styles.sectionLabel}>Song topic / idea</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="fake friends, come-up story, late-night drive…"
+        placeholderTextColor="#ff9a9a"
+        value={topic}
+        onChangeText={setTopic}
+      />
+
+      <Text style={styles.sectionLabel}>Rhyme target (word at end of bar)</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="pain, money, city, forever…"
+        placeholderTextColor="#ff9a9a"
+        value={rhyme}
+        onChangeText={setRhyme}
+      />
+
+      <TouchableOpacity style={styles.mainButton} onPress={handleGenerate}>
+        <Text style={styles.mainButtonText}>Generate sample bars</Text>
+      </TouchableOpacity>
+
+      <View style={styles.outputCard}>
+        <Text style={styles.outputLabel}>Demo only</Text>
+        <Text style={styles.outputText}>{bars}</Text>
+      </View>
+    </ScrollView>
+  );
+}
+
+/* ---------- AUTOTUNE LAB (UI ONLY) ---------- */
+/* Looks like an Antares rack, but does NOT run real Auto-Tune yet.
+   A future native audio engine / licensed SDK would be wired here. */
+
+function AutoTuneScreen() {
+  const [key, setKey] = useState("C");
+  const [scale, setScale] = useState("Minor");
+  const [retune, setRetune] = useState(40);
+  const [humanize, setHumanize] = useState(35);
+  const [formant, setFormant] = useState(true);
+
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.screenInner}>
+      <Text style={styles.badgeLive}>RACK • AUTOTUNE</Text>
+      <Text style={styles.title}>AutoTune Lab</Text>
+      <Text style={styles.subtitle}>Antares-style control panel (UI)</Text>
+
+      <View style={styles.card}>
+        <Text style={styles.sectionLabel}>Key</Text>
+        <View style={styles.rowWrap}>
+          {["C", "D", "E", "F", "G", "A", "B"].map((k) => (
+            <Pill
+              key={k}
+              label={k}
+              active={key === k}
+              onPress={() => setKey(k)}
+            />
+          ))}
+        </View>
+
+        <Text style={styles.sectionLabel}>Scale</Text>
+        <View style={styles.rowWrap}>
+          {["Major", "Minor", "Chromatic"].map((sc) => (
+            <Pill
+              key={sc}
+              label={sc}
+              active={scale === sc}
+              onPress={() => setScale(sc)}
+            />
+          ))}
+        </View>
+
+        <Text style={styles.sectionLabel}>
+          Retune speed (0 = natural, 100 = robotic)
+        </Text>
+        <Text style={styles.sliderFake}>Current: {retune}</Text>
+
+        <Text style={styles.sectionLabel}>Humanize</Text>
+        <Text style={styles.sliderFake}>Current: {humanize}</Text>
+
+        <Text style={styles.sectionLabel}>Formant</Text>
+        <View style={styles.rowWrap}>
+          <Pill
+            label="On"
+            active={formant}
+            onPress={() => setFormant(true)}
+          />
+          <Pill
+            label="Off"
+            active={!formant}
+            onPress={() => setFormant(false)}
+          />
+        </View>
+
+        <Text style={styles.warningText}>
+          Audio engine note: this screen is design-only right now. To ship a
+          real Auto-Tune stack to App Store / Google Play later, a licensed
+          DSP or custom pitch-correction engine must be added on native
+          iOS/Android.
+        </Text>
+      </View>
+    </ScrollView>
+  );
+}
+
+/* ---------- COVER ART LAB ---------- */
+
+function CoverArtScreen() {
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.screenInner}>
+      <Text style={styles.badgeLive}>COVER • BAR LAB</Text>
+      <Text style={styles.title}>Cover Art Lab</Text>
+      <Text style={styles.subtitle}>Red-zone artwork directions</Text>
+
+      <View style={styles.card}>
+        <Text style={styles.sectionLabel}>Concept notes</Text>
+        <Text style={styles.infoText}>
+          • Dark studio, neon red “BAR LAB” logo floating above a mic.{"\n"}
+          • Black background, red waveform wrapping around your silhouette.{"\n"}
+          • You in a red-lit booth, headphones on, city lights behind glass.
+        </Text>
+        <Text style={styles.infoText}>
+          These notes guide designers / AI artists when you create single
+          covers, album art and store screenshots.
+        </Text>
+      </View>
+    </ScrollView>
+  );
+}
+
+/* ---------- TEMPLATES ---------- */
+
+function TemplatesScreen() {
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.screenInner}>
+      <Text style={styles.badgeLive}>TEMPLATES</Text>
+      <Text style={styles.title}>Song Templates</Text>
+      <Text style={styles.subtitle}>Hooks • Verses • Bridges</Text>
+
+      <View style={styles.card}>
+        <Text style={styles.sectionLabel}>3-part radio template</Text>
+        <Text style={styles.infoText}>
+          • Intro (2 bars) – space for ad-libs / producer tag.{"\n"}
+          • Hook (8 bars) – simple, catchy idea.{"\n"}
+          • Verse (16 bars) – story, flex, pain.{"\n"}
+          • Hook (8 bars).{"\n"}
+          • Optional bridge (4–8 bars), then final hook.
+        </Text>
+
+        <Text style={styles.sectionLabel}>Melodic pain template</Text>
+        <Text style={styles.infoText}>
+          • Soft melodic hook with autotune.{"\n"}
+          • Verse mixes rap + melody.{"\n"}
+          • Beat switch in the last 4 bars for rage / flex outro.
+        </Text>
+      </View>
+    </ScrollView>
+  );
+}
+
+/* ---------- CREATOR / ABOUT ---------- */
+
+function CreatorScreen() {
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.screenInner}>
+      <Text style={styles.badgeLive}>CREATOR</Text>
+      <Text style={styles.title}>BAR LAB • CEO</Text>
+      <Text style={styles.subtitle}>Built for artists, by an artist</Text>
+
+      <View style={styles.card}>
+        <Text style={styles.sectionLabel}>William Taylor</Text>
+        <Text style={styles.infoText}>
+          Founder & CEO of BAR LAB. Artist, writer and curator of the red-zone
+          studio – focused on hooks, verses, autotune sauce and cover art that
+          feel global but still sound like you.
+        </Text>
+
+        <Text style={styles.sectionLabel}>Vision</Text>
+        <Text style={styles.infoText}>
+          • One app where you can cook lyrics, shape your autotune tone, and
+          plan cover art.{"\n"}
+          • Designed to grow into a full mobile studio for iOS and Android.{"\n"}
+          • Future versions plug into real AI backends and vocal processing.
+        </Text>
+      </View>
+    </ScrollView>
+  );
+}
+
+/* ---------- ROOT APP ---------- */
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <StatusBar style="light" />
+      <Tab.Navigator
+        screenOptions={{
+          headerStyle: { backgroundColor: "#050006" },
+          headerTintColor: "#ffffff",
+          headerTitleStyle: { fontWeight: "700", letterSpacing: 1 },
+          tabBarStyle: { backgroundColor: "#050006", borderTopColor: "#301018" },
+          tabBarActiveTintColor: "#ff2b5b",
+          tabBarInactiveTintColor: "#f9f9ff"
+        }}
+      >
+        <Tab.Screen name="Lyric Lab" component={LyricLabScreen} />
+        <Tab.Screen name="AutoTune" component={AutoTuneScreen} />
+        <Tab.Screen name="Cover Art" component={CoverArtScreen} />
+        <Tab.Screen name="Templates" component={TemplatesScreen} />
+        <Tab.Screen name="Creator" component={CreatorScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
+
+/* ---------- STYLES ---------- */
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#050006"
+  },
+  screenInner: {
+    padding: 20,
+    paddingBottom: 40
+  },
+  badgeLive: {
+    color: "#ff667f",
+    fontSize: 12,
+    letterSpacing: 2,
+    marginBottom: 6,
+    textTransform: "uppercase"
+  },
+  title: {
+    color: "#ffffff",
+    fontSize: 26,
+    fontWeight: "800",
+    letterSpacing: 1,
+    marginBottom: 2
+  },
+  subtitle: {
+    color: "#ffb3c4",
+    fontSize: 14,
+    marginBottom: 18
+  },
+  sectionLabel: {
+    color: "#f9f9ff",
+    fontSize: 13,
+    marginTop: 16,
+    marginBottom: 6,
+    fontWeight: "600"
+  },
+  rowWrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8
+  },
+  pill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#612033",
+    marginBottom: 8
+  },
+  pillActive: {
+    backgroundColor: "#ff2b5b",
+    borderColor: "#ff2b5b"
+  },
+  pillText: {
+    color: "#ffb3c4",
+    fontSize: 12
+  },
+  pillTextActive: {
+    color: "#050006",
+    fontWeight: "700"
+  },
+  input: {
+    backgroundColor: "#18040c",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#612033",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: "#ffffff",
+    fontSize: 13
+  },
+  mainButton: {
+    marginTop: 18,
+    backgroundColor: "#ff2b5b",
+    borderRadius: 999,
+    paddingVertical: 12,
+    alignItems: "center"
+  },
+  mainButtonText: {
+    color: "#050006",
+    fontWeight: "800",
+    fontSize: 14,
+    letterSpacing: 1
+  },
+  outputCard: {
+    marginTop: 18,
+    backgroundColor: "#12010a",
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#612033"
+  },
+  outputLabel: {
+    color: "#ff667f",
+    fontSize: 11,
+    marginBottom: 6,
+    textTransform: "uppercase",
+    letterSpacing: 1
+  },
+  outputText: {
+    color: "#ffffff",
+    fontSize: 13,
+    lineHeight: 20
+  },
+  card: {
+    backgroundColor: "#12010a",
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#612033",
+    marginTop: 4
+  },
+  infoText: {
+    color: "#f9f9ff",
+    fontSize: 13,
+    lineHeight: 20,
+    marginTop: 4
+  },
+  sliderFake: {
+    color: "#ffb3c4",
+    fontSize: 13,
+    backgroundColor: "#18040c",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginTop: 4
+  },
+  warningText: {
+    color: "#ff9a9a",
+    fontSize: 11,
+    marginTop: 14,
+    lineHeight: 18
+  }
+});
